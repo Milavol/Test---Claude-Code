@@ -4,9 +4,8 @@ Progetto di esempio creato con Claude Code.
 
 ## Struttura
 
-- `index.html`: la struttura della pagina
-- `style.css`: lo stile grafico
-- `script.js`: il comportamento (un contatore di clic sul bottone)
+- `index.html`: pagina di motion design (CSS e JavaScript inclusi nel file)
+- `contatore/`: vecchia pagina di esempio con il contatore di clic (`index.html`, `style.css`, `script.js`)
 
 ## Come vederlo
 
