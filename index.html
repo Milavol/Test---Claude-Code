@@ -3,15 +3,545 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Progetto di esempio</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>Motion Showcase</title>
+    <style>
+      :root {
+        --ink: #0b0b14;
+        --paper: #f7f5ff;
+        --a: #ff5fa2;
+        --b: #7c5cff;
+        --c: #22d3ee;
+        --d: #facc15;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--ink);
+        color: var(--paper);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        overflow-x: hidden;
+      }
+
+      /* ---------- Sfondo animato ---------- */
+      .blob {
+        position: fixed;
+        width: 60vmax;
+        height: 60vmax;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.45;
+        z-index: -1;
+        animation: drift 18s ease-in-out infinite alternate;
+      }
+      .blob.one {
+        background: var(--a);
+        top: -20vmax;
+        left: -15vmax;
+      }
+      .blob.two {
+        background: var(--b);
+        bottom: -25vmax;
+        right: -20vmax;
+        animation-duration: 22s;
+        animation-delay: -6s;
+      }
+      .blob.three {
+        background: var(--c);
+        top: 30%;
+        left: 40%;
+        width: 40vmax;
+        height: 40vmax;
+        opacity: 0.25;
+        animation-duration: 26s;
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translate(0, 0) scale(1);
+        }
+        to {
+          transform: translate(8vw, 6vh) scale(1.25);
+        }
+      }
+
+      /* Alone che segue il cursore */
+      .glow {
+        position: fixed;
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        mix-blend-mode: screen;
+      }
+
+      /* ---------- Hero ---------- */
+      section {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 6rem 1.5rem;
+        position: relative;
+      }
+
+      .wrap {
+        max-width: 1000px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        font-size: 0.85rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        padding: 0.4rem 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 999px;
+        opacity: 0;
+        animation: fadeUp 0.8s 0.2s forwards;
+      }
+
+      h1 {
+        font-size: clamp(3rem, 12vw, 9rem);
+        line-height: 0.95;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        margin: 1.5rem 0;
+      }
+
+      /* Ogni lettera entra con un ritardo diverso */
+      .letters span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(60px) rotate(8deg);
+        animation: letterIn 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+        animation-delay: calc(var(--i) * 60ms + 0.4s);
+      }
+
+      .gradient-text {
+        background: linear-gradient(90deg, var(--a), var(--d), var(--c), var(--b), var(--a));
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: shimmer 6s linear infinite;
+      }
+
+      .sub {
+        font-size: clamp(1rem, 2.2vw, 1.3rem);
+        opacity: 0;
+        animation: fadeUp 0.9s 1.8s forwards;
+        max-width: 36ch;
+        margin: 0 auto 2.5rem;
+      }
+
+      .cta {
+        display: inline-block;
+        padding: 1rem 2rem;
+        border-radius: 999px;
+        background: var(--paper);
+        color: var(--ink);
+        font-weight: 700;
+        text-decoration: none;
+        opacity: 0;
+        animation: fadeUp 0.9s 2.2s forwards;
+        transition: transform 0.2s;
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        width: 2px;
+        height: 60px;
+        background: linear-gradient(var(--paper), transparent);
+        transform-origin: top;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      /* ---------- Sezioni con reveal allo scroll ---------- */
+      .reveal {
+        opacity: 0;
+        transform: translateY(80px) scale(0.96);
+        transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 6vw, 4.5rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 1rem;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-top: 3rem;
+      }
+
+      .card {
+        position: relative;
+        padding: 2rem;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: left;
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s;
+        transform-style: preserve-3d;
+      }
+      .card:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .card .icon {
+        font-size: 2.5rem;
+        display: inline-block;
+        margin-bottom: 1rem;
+      }
+      .card:hover .icon {
+        animation: wiggle 0.6s ease-in-out;
+      }
+      .card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+      }
+      .card p {
+        opacity: 0.7;
+        line-height: 1.5;
+      }
+
+      /* ---------- Bottone magnetico ---------- */
+      .magnet {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 1.2rem 2.4rem;
+        border: none;
+        border-radius: 999px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        cursor: pointer;
+        color: var(--ink);
+        background: linear-gradient(120deg, var(--d), var(--a));
+        transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      /* ---------- Canvas particelle ---------- */
+      #particles {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      /* ---------- Contatore ---------- */
+      .count {
+        font-size: clamp(4rem, 14vw, 10rem);
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        margin-top: 1rem;
+      }
+
+      footer {
+        text-align: center;
+        padding: 3rem 1rem;
+        opacity: 0.5;
+        font-size: 0.9rem;
+      }
+
+      /* ---------- Keyframes ---------- */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes letterIn {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes shimmer {
+        to {
+          background-position: 300% 0;
+        }
+      }
+      @keyframes wiggle {
+        0%,
+        100% {
+          transform: rotate(0);
+        }
+        25% {
+          transform: rotate(-12deg) scale(1.1);
+        }
+        75% {
+          transform: rotate(12deg) scale(1.1);
+        }
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scaleY(0.2);
+          opacity: 0.3;
+        }
+        50% {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+      }
+
+      /* Rispetta chi ha disattivato le animazioni nel sistema */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .glow {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <main class="card">
-      <h1>Ciao dal repository!</h1>
-      <p>Questa è una pagina di partenza creata con Claude Code.</p>
-      <button id="contatore" type="button">Cliccato 0 volte</button>
-    </main>
-    <script src="script.js"></script>
+    <div class="blob one"></div>
+    <div class="blob two"></div>
+    <div class="blob three"></div>
+    <canvas id="particles"></canvas>
+    <div class="glow" id="glow"></div>
+
+    <!-- Hero -->
+    <section>
+      <div class="wrap">
+        <span class="eyebrow">Motion design · demo</span>
+        <h1>
+          <span class="letters" id="title">Muoviti</span><br />
+          <span class="gradient-text">con stile</span>
+        </h1>
+        <p class="sub">Una pagina senza librerie esterne: solo CSS e un po' di JavaScript.</p>
+        <a class="cta" href="#trucchi">Scopri i trucchi ↓</a>
+        <div class="scroll-hint"></div>
+      </div>
+    </section>
+
+    <!-- Trucchi -->
+    <section id="trucchi">
+      <div class="wrap">
+        <h2 class="reveal">Cosa fa?</h2>
+        <div class="cards">
+          <div class="card reveal">
+            <span class="icon">🌀</span>
+            <h3>Sfondo fluido</h3>
+            <p>Tre sfere sfocate che si spostano lentamente e cambiano scala.</p>
+          </div>
+          <div class="card reveal">
+            <span class="icon">🔤</span>
+            <h3>Lettere a cascata</h3>
+            <p>Ogni lettera entra con un ritardo diverso e una leggera rotazione.</p>
+          </div>
+          <div class="card reveal">
+            <span class="icon">✨</span>
+            <h3>Alone del cursore</h3>
+            <p>Una luce segue il mouse e si fonde con i colori sotto.</p>
+          </div>
+          <div class="card reveal">
+            <span class="icon">🎈</span>
+            <h3>Reveal allo scroll</h3>
+            <p>Gli elementi salgono e appaiono quando li raggiungi.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contatore + bottone -->
+    <section>
+      <div class="wrap">
+        <h2 class="reveal">Clicca e scopri</h2>
+        <p class="reveal" style="opacity: 0.7">Il bottone segue il mouse quando ci passi sopra.</p>
+        <div class="count reveal" id="count">0</div>
+        <button class="magnet reveal" id="magnet" type="button">Clicca qui</button>
+      </div>
+    </section>
+
+    <footer>Fatto con CSS, JavaScript e tanta voglia di muovere le cose.</footer>
+
+    <script>
+      // Lettere del titolo: le avvolge in <span> con un ritardo diverso
+      const title = document.getElementById("title");
+      title.innerHTML = [...title.textContent]
+        .map((ch, i) => `<span style="--i:${i}">${ch === " " ? "&nbsp;" : ch}</span>`)
+        .join("");
+
+      // Alone che segue il cursore, con un leggero ritardo (lerp)
+      const glow = document.getElementById("glow");
+      let mx = innerWidth / 2, my = innerHeight / 2, gx = mx, gy = my;
+      addEventListener("pointermove", (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+      });
+      (function followGlow() {
+        gx += (mx - gx) * 0.12;
+        gy += (my - gy) * 0.12;
+        glow.style.left = gx + "px";
+        glow.style.top = gy + "px";
+        requestAnimationFrame(followGlow);
+      })();
+
+      // Reveal allo scroll
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in");
+              io.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.15 }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+      // Inclinazione 3D delle card con il mouse
+      document.querySelectorAll(".card").forEach((card) => {
+        card.addEventListener("pointermove", (e) => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          card.style.transform = `perspective(700px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) translateY(-6px)`;
+        });
+        card.addEventListener("pointerleave", () => {
+          card.style.transform = "";
+        });
+      });
+
+      // Bottone magnetico + contatore
+      const magnet = document.getElementById("magnet");
+      const countEl = document.getElementById("count");
+      let clicks = 0;
+      magnet.addEventListener("pointermove", (e) => {
+        const r = magnet.getBoundingClientRect();
+        const x = e.clientX - (r.left + r.width / 2);
+        const y = e.clientY - (r.top + r.height / 2);
+        magnet.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+      });
+      magnet.addEventListener("pointerleave", () => {
+        magnet.style.transform = "";
+      });
+      magnet.addEventListener("click", () => {
+        clicks += 1;
+        countEl.textContent = clicks;
+        countEl.animate(
+          [
+            { transform: "scale(1)" },
+            { transform: "scale(1.3) rotate(-4deg)" },
+            { transform: "scale(1)" },
+          ],
+          { duration: 350, easing: "cubic-bezier(0.2, 0.9, 0.3, 1.4)" }
+        );
+        // Piccola esplosione di particelle
+        burst(magnet.getBoundingClientRect());
+      });
+
+      // Canvas con particelle che galleggiano
+      const canvas = document.getElementById("particles");
+      const ctx = canvas.getContext("2d");
+      const colors = ["#ff5fa2", "#7c5cff", "#22d3ee", "#facc15"];
+      let parts = [];
+      function resize() {
+        canvas.width = innerWidth * devicePixelRatio;
+        canvas.height = innerHeight * devicePixelRatio;
+        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      }
+      addEventListener("resize", resize);
+      resize();
+      for (let i = 0; i < 60; i++) {
+        parts.push(newPart(true));
+      }
+      function newPart(anywhere) {
+        return {
+          x: Math.random() * innerWidth,
+          y: anywhere ? Math.random() * innerHeight : innerHeight + 10,
+          r: 1 + Math.random() * 3,
+          vy: -(0.2 + Math.random() * 0.6),
+          vx: (Math.random() - 0.5) * 0.3,
+          c: colors[Math.floor(Math.random() * colors.length)],
+          life: 1,
+          burst: false,
+        };
+      }
+      function burst(rect) {
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        for (let i = 0; i < 40; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const s = 2 + Math.random() * 5;
+          parts.push({
+            x: cx,
+            y: cy,
+            r: 2 + Math.random() * 3,
+            vx: Math.cos(a) * s,
+            vy: Math.sin(a) * s,
+            c: colors[Math.floor(Math.random() * colors.length)],
+            life: 1,
+            burst: true,
+          });
+        }
+      }
+      (function draw() {
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        parts = parts.filter((p) => p.life > 0);
+        for (const p of parts) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.burst) {
+            p.vx *= 0.96;
+            p.vy = p.vy * 0.96 + 0.08;
+            p.life -= 0.018;
+          } else if (p.y < -10) {
+            Object.assign(p, newPart(false));
+          }
+          ctx.globalAlpha = Math.max(p.life, 0) * 0.8;
+          ctx.fillStyle = p.c;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Mantiene almeno un po' di particelle di sfondo
+        while (parts.filter((p) => !p.burst).length < 60) {
+          parts.push(newPart(false));
+        }
+        requestAnimationFrame(draw);
+      })();
+    </script>
   </body>
 </html>
