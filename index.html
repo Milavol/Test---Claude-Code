@@ -3,15 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Motion Showcase</title>
+    <title>Nebula — Dentro il PC</title>
     <style>
       :root {
-        --ink: #0b0b14;
-        --paper: #f7f5ff;
-        --a: #ff5fa2;
-        --b: #7c5cff;
-        --c: #22d3ee;
-        --d: #facc15;
+        --bg: #05050c;
+        --ink: #eef0ff;
+        --dim: rgba(238, 240, 255, 0.6);
+        --pink: #ff4d9d;
+        --violet: #8b5cf6;
+        --cyan: #22d3ee;
+        --lime: #a3e635;
+        --gold: #fbbf24;
+        --glass: rgba(255, 255, 255, 0.06);
+        --line: rgba(255, 255, 255, 0.12);
       }
 
       * {
@@ -21,159 +25,577 @@
 
       html {
         scroll-behavior: smooth;
+        background: var(--bg);
       }
 
       body {
-        background: var(--ink);
-        color: var(--paper);
+        background: var(--bg);
+        color: var(--ink);
         font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
         overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
       }
 
-      /* ---------- Sfondo animato ---------- */
-      .blob {
-        position: fixed;
-        width: 60vmax;
-        height: 60vmax;
-        border-radius: 50%;
-        filter: blur(80px);
-        opacity: 0.45;
-        z-index: -1;
-        animation: drift 18s ease-in-out infinite alternate;
-      }
-      .blob.one {
-        background: var(--a);
-        top: -20vmax;
-        left: -15vmax;
-      }
-      .blob.two {
-        background: var(--b);
-        bottom: -25vmax;
-        right: -20vmax;
-        animation-duration: 22s;
-        animation-delay: -6s;
-      }
-      .blob.three {
-        background: var(--c);
-        top: 30%;
-        left: 40%;
-        width: 40vmax;
-        height: 40vmax;
-        opacity: 0.25;
-        animation-duration: 26s;
-        animation-delay: -12s;
-      }
-      @keyframes drift {
-        from {
-          transform: translate(0, 0) scale(1);
-        }
-        to {
-          transform: translate(8vw, 6vh) scale(1.25);
-        }
+      a {
+        color: inherit;
       }
 
-      /* Alone che segue il cursore */
-      .glow {
-        position: fixed;
-        width: 320px;
-        height: 320px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
-        pointer-events: none;
-        transform: translate(-50%, -50%);
-        z-index: 1;
-        mix-blend-mode: screen;
-      }
-
-      /* ---------- Hero ---------- */
-      section {
+      /* ================= HERO ================= */
+      .hero {
+        position: relative;
         min-height: 100vh;
         display: grid;
         place-items: center;
-        padding: 6rem 1.5rem;
-        position: relative;
-      }
-
-      .wrap {
-        max-width: 1000px;
-        width: 100%;
         text-align: center;
+        padding: 6rem 1.5rem 4rem;
+        overflow: hidden;
       }
 
-      .eyebrow {
-        display: inline-block;
-        font-size: 0.85rem;
-        letter-spacing: 0.3em;
+      /* Pavimento prospettico che scorre */
+      .floor {
+        position: absolute;
+        left: -50%;
+        right: -50%;
+        bottom: -10%;
+        height: 70%;
+        background-image: linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 60px 60px;
+        transform: perspective(500px) rotateX(62deg);
+        transform-origin: center bottom;
+        mask-image: linear-gradient(transparent, #000 60%);
+        -webkit-mask-image: linear-gradient(transparent, #000 60%);
+        animation: floorMove 4s linear infinite;
+      }
+      @keyframes floorMove {
+        to {
+          background-position: 0 60px, 0 0;
+        }
+      }
+
+      .orb {
+        position: absolute;
+        width: 55vmax;
+        height: 55vmax;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.35;
+        z-index: -1;
+      }
+      .orb.a {
+        background: var(--pink);
+        top: -20vmax;
+        left: -15vmax;
+        animation: float 14s ease-in-out infinite alternate;
+      }
+      .orb.b {
+        background: var(--violet);
+        bottom: -25vmax;
+        right: -20vmax;
+        animation: float 18s ease-in-out infinite alternate-reverse;
+      }
+      @keyframes float {
+        to {
+          transform: translate(6vw, 5vh) scale(1.2);
+        }
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.25em;
         text-transform: uppercase;
-        padding: 0.4rem 1rem;
-        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--line);
         border-radius: 999px;
+        background: var(--glass);
         opacity: 0;
-        animation: fadeUp 0.8s 0.2s forwards;
+        animation: rise 0.8s 0.2s forwards;
+      }
+      .badge i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--lime);
+        box-shadow: 0 0 12px var(--lime);
+        animation: blink 1.4s ease-in-out infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0.3;
+        }
       }
 
-      h1 {
-        font-size: clamp(3rem, 12vw, 9rem);
-        line-height: 0.95;
+      .hero h1 {
+        font-size: clamp(3.4rem, 13vw, 11rem);
+        line-height: 0.9;
         font-weight: 900;
-        letter-spacing: -0.04em;
-        margin: 1.5rem 0;
+        letter-spacing: -0.05em;
+        margin: 1.5rem 0 1rem;
       }
-
-      /* Ogni lettera entra con un ritardo diverso */
-      .letters span {
-        display: inline-block;
+      .hero h1 .line {
+        display: block;
         opacity: 0;
-        transform: translateY(60px) rotate(8deg);
-        animation: letterIn 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
-        animation-delay: calc(var(--i) * 60ms + 0.4s);
+        transform: translateY(40px);
+        animation: rise 1s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
       }
-
-      .gradient-text {
-        background: linear-gradient(90deg, var(--a), var(--d), var(--c), var(--b), var(--a));
+      .hero h1 .line:nth-child(2) {
+        animation-delay: 0.25s;
+      }
+      .grad {
+        background: linear-gradient(90deg, var(--pink), var(--gold), var(--cyan), var(--violet), var(--pink));
         background-size: 300% 100%;
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        animation: shimmer 6s linear infinite;
+        animation: shimmer 5s linear infinite;
+      }
+      @keyframes shimmer {
+        to {
+          background-position: 300% 0;
+        }
       }
 
-      .sub {
-        font-size: clamp(1rem, 2.2vw, 1.3rem);
-        opacity: 0;
-        animation: fadeUp 0.9s 1.8s forwards;
-        max-width: 36ch;
+      .hero p {
+        max-width: 44ch;
         margin: 0 auto 2.5rem;
+        color: var(--dim);
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        line-height: 1.5;
+        opacity: 0;
+        animation: rise 0.9s 0.8s forwards;
       }
 
-      .cta {
+      .btn {
         display: inline-block;
         padding: 1rem 2rem;
         border-radius: 999px;
-        background: var(--paper);
-        color: var(--ink);
-        font-weight: 700;
+        background: var(--ink);
+        color: var(--bg);
+        font-weight: 800;
         text-decoration: none;
         opacity: 0;
-        animation: fadeUp 0.9s 2.2s forwards;
-        transition: transform 0.2s;
+        animation: rise 0.9s 1.1s forwards;
+        transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s;
+      }
+      .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(255, 77, 157, 0.4);
       }
 
-      .scroll-hint {
+      .hint {
         position: absolute;
         bottom: 2rem;
         left: 50%;
-        width: 2px;
-        height: 60px;
-        background: linear-gradient(var(--paper), transparent);
-        transform-origin: top;
-        animation: pulse 2s ease-in-out infinite;
+        transform: translateX(-50%);
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--dim);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .hint::after {
+        content: "";
+        width: 1px;
+        height: 48px;
+        background: linear-gradient(var(--ink), transparent);
+        animation: drop 1.8s ease-in-out infinite;
+      }
+      @keyframes drop {
+        0% {
+          transform: scaleY(0);
+          transform-origin: top;
+        }
+        50% {
+          transform: scaleY(1);
+          transform-origin: top;
+        }
+        51% {
+          transform-origin: bottom;
+        }
+        100% {
+          transform: scaleY(0);
+          transform-origin: bottom;
+        }
       }
 
-      /* ---------- Sezioni con reveal allo scroll ---------- */
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* ================= SCOMPOSIZIONE ================= */
+      .explode {
+        position: relative;
+        height: 380vh;
+      }
+      .stage {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+      }
+
+      .intro-txt {
+        position: absolute;
+        top: 9vh;
+        left: 0;
+        right: 0;
+        text-align: center;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .intro-txt h2 {
+        font-size: clamp(2rem, 6vw, 4.2rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+      .intro-txt p {
+        color: var(--dim);
+        margin-top: 0.6rem;
+      }
+
+      .scene {
+        position: relative;
+        width: min(92vw, 720px);
+        height: min(80vh, 640px);
+        perspective: 1400px;
+        --p: 0;
+        --rx: 0deg;
+        --ry: 0deg;
+        margin-top: 8vh;
+      }
+      .rig {
+        position: absolute;
+        inset: 0;
+        transform-style: preserve-3d;
+        transform: rotateX(calc(-14deg + var(--rx))) rotateY(calc(-24deg + var(--ry)));
+        transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      /* Ogni pezzo: si muove con --p (0 → 1) lungo il proprio vettore */
+      .piece {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: var(--w);
+        height: var(--h);
+        border-radius: var(--r, 10px);
+        transform-style: preserve-3d;
+        transform:
+          translate3d(
+            calc(-50% + var(--bx, 0px) + var(--ex, 0px) * var(--p)),
+            calc(-50% + var(--by, 0px) + var(--ey, 0px) * var(--p)),
+            calc(var(--ez, 0px) * var(--p))
+          );
+        will-change: transform;
+      }
+
+      /* Chassis: solo bordo luminoso */
+      .chassis {
+        border: 1.5px solid rgba(255, 255, 255, 0.35);
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+        box-shadow: inset 0 0 60px rgba(139, 92, 246, 0.2), 0 0 60px rgba(139, 92, 246, 0.15);
+        border-radius: 22px;
+      }
+
+      /* Scheda madre */
+      .mobo {
+        background:
+          radial-gradient(circle at 20% 30%, rgba(163, 230, 53, 0.25), transparent 40%),
+          linear-gradient(135deg, #0f3d2a, #0a2319);
+        border: 1px solid rgba(163, 230, 53, 0.4);
+        border-radius: 8px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      }
+      .mobo::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border: 1px dashed rgba(163, 230, 53, 0.25);
+        border-radius: 6px;
+      }
+      /* Piccoli chip sulla scheda */
+      .mobo::after {
+        content: "";
+        position: absolute;
+        left: 16%;
+        bottom: 16%;
+        width: 26%;
+        height: 14%;
+        background: repeating-linear-gradient(90deg, #cbd5e1 0 6px, transparent 6px 10px);
+        opacity: 0.5;
+        border-radius: 3px;
+      }
+
+      /* Processore */
+      .cpu {
+        background: linear-gradient(135deg, #d4d4d8, #71717a 50%, #e4e4e7);
+        border-radius: 8px;
+        box-shadow: 0 0 40px rgba(251, 191, 36, 0.35);
+      }
+      .cpu::before {
+        content: "";
+        position: absolute;
+        inset: 18%;
+        border-radius: 4px;
+        background: radial-gradient(circle, #18181b, #09090b);
+        box-shadow: 0 0 0 1px var(--gold);
+      }
+
+      /* Dissipatore */
+      .cooler {
+        border-radius: 50%;
+        background:
+          radial-gradient(circle, #0a0a0a 0 22%, transparent 23%),
+          repeating-conic-gradient(from 0deg, #3f3f46 0 8deg, #18181b 8deg 16deg);
+        box-shadow: 0 0 30px rgba(34, 211, 238, 0.35);
+        animation: spin 6s linear infinite;
+      }
+      /* Usa la proprietà "rotate" così non sovrascrive la posizione 3D */
+      @keyframes spin {
+        to {
+          rotate: 360deg;
+        }
+      }
+
+      /* RAM */
+      .ram {
+        background: linear-gradient(90deg, #1e1b4b, #4c1d95, #1e1b4b);
+        border-radius: 3px;
+        box-shadow: 0 0 18px rgba(139, 92, 246, 0.6);
+      }
+      .ram::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 6px;
+        height: 4px;
+        background: var(--pink);
+        box-shadow: 0 0 10px var(--pink);
+      }
+
+      /* Scheda video */
+      .gpu {
+        background: linear-gradient(120deg, #1c1917, #292524);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      }
+      .gpu::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 4px;
+        border-radius: 0 0 10px 10px;
+        background: linear-gradient(90deg, var(--pink), var(--cyan));
+        box-shadow: 0 0 18px var(--cyan);
+      }
+
+      .fan {
+        border-radius: 50%;
+        background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.25) 0 10deg, transparent 10deg 30deg),
+          radial-gradient(circle, #0c0a1d 0 32%, #1e1b4b 33%);
+        box-shadow: 0 0 30px rgba(34, 211, 238, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.8);
+        animation: spin 1.2s linear infinite;
+      }
+
+      /* SSD */
+      .ssd {
+        background: linear-gradient(90deg, #052e16, #14532d);
+        border: 1px solid var(--lime);
+        border-radius: 4px;
+        box-shadow: 0 0 20px rgba(163, 230, 53, 0.5);
+      }
+
+      /* Alimentatore */
+      .psu {
+        background: linear-gradient(135deg, #27272a, #09090b);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      }
+
+      .piece::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 40%);
+      }
+
+      /* Etichette, appaiono a fine scomposizione */
+      .labels {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 3;
+      }
+      .tag {
+        position: absolute;
+        font-size: 0.8rem;
+        font-weight: 700;
+        white-space: nowrap;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(5, 5, 12, 0.7);
+        border: 1px solid var(--line);
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        transform: translateX(var(--from, 0)) ;
+        transition: opacity 0.6s, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition-delay: var(--d, 0s);
+      }
+      .tag b {
+        color: var(--c, var(--cyan));
+      }
+      .explode.lit .tag {
+        opacity: 1;
+        transform: none;
+      }
+      .tag.l {
+        --from: 20px;
+      }
+      .tag.r {
+        --from: -20px;
+      }
+
+      /* Pannello di spiegazione */
+      .readout {
+        position: absolute;
+        bottom: 5vh;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 0.8rem;
+        color: var(--dim);
+        letter-spacing: 0.1em;
+        z-index: 3;
+        text-align: center;
+      }
+      .readout span {
+        color: var(--ink);
+      }
+
+      /* ================= SPECS ================= */
+      section.specs {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 8rem 1.5rem;
+      }
+      .wrap {
+        max-width: 1100px;
+        width: 100%;
+      }
+      h2.big {
+        font-size: clamp(2.4rem, 7vw, 5rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        margin-bottom: 1rem;
+      }
+      .sub {
+        color: var(--dim);
+        font-size: 1.1rem;
+        max-width: 50ch;
+      }
+
+      .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 1.2rem;
+        margin-top: 3.5rem;
+      }
+      .spec {
+        position: relative;
+        padding: 1.8rem;
+        border-radius: 22px;
+        background: var(--glass);
+        border: 1px solid var(--line);
+        overflow: hidden;
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s;
+      }
+      .spec:hover {
+        transform: translateY(-6px);
+        border-color: var(--c);
+      }
+      .spec::before {
+        content: "";
+        position: absolute;
+        top: -40%;
+        right: -40%;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: var(--c);
+        filter: blur(60px);
+        opacity: 0.35;
+        transition: opacity 0.4s;
+      }
+      .spec:hover::before {
+        opacity: 0.7;
+      }
+      .spec small {
+        font-size: 0.75rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--dim);
+      }
+      .spec strong {
+        display: block;
+        font-size: 1.7rem;
+        font-weight: 800;
+        margin: 0.5rem 0;
+      }
+      .spec p {
+        color: var(--dim);
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      /* ================= FINALE ================= */
+      .outro {
+        text-align: center;
+        padding: 6rem 1.5rem 8rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .outro h2 {
+        font-size: clamp(2.2rem, 7vw, 5.5rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 1;
+      }
+      .outro p {
+        color: var(--dim);
+        margin: 1.2rem auto 2.5rem;
+      }
+      footer {
+        text-align: center;
+        padding: 2rem;
+        color: var(--dim);
+        font-size: 0.8rem;
+        border-top: 1px solid var(--line);
+      }
+
+      /* Reveal allo scroll */
       .reveal {
         opacity: 0;
-        transform: translateY(80px) scale(0.96);
+        transform: translateY(60px);
         transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .reveal.in {
@@ -181,137 +603,6 @@
         transform: none;
       }
 
-      h2 {
-        font-size: clamp(2rem, 6vw, 4.5rem);
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        margin-bottom: 1rem;
-      }
-
-      .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1.5rem;
-        margin-top: 3rem;
-      }
-
-      .card {
-        position: relative;
-        padding: 2rem;
-        border-radius: 24px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        text-align: left;
-        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s;
-        transform-style: preserve-3d;
-      }
-      .card:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
-      .card .icon {
-        font-size: 2.5rem;
-        display: inline-block;
-        margin-bottom: 1rem;
-      }
-      .card:hover .icon {
-        animation: wiggle 0.6s ease-in-out;
-      }
-      .card h3 {
-        font-size: 1.3rem;
-        margin-bottom: 0.5rem;
-      }
-      .card p {
-        opacity: 0.7;
-        line-height: 1.5;
-      }
-
-      /* ---------- Bottone magnetico ---------- */
-      .magnet {
-        display: inline-block;
-        margin-top: 2rem;
-        padding: 1.2rem 2.4rem;
-        border: none;
-        border-radius: 999px;
-        font-size: 1.1rem;
-        font-weight: 800;
-        cursor: pointer;
-        color: var(--ink);
-        background: linear-gradient(120deg, var(--d), var(--a));
-        transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-
-      /* ---------- Canvas particelle ---------- */
-      #particles {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        pointer-events: none;
-      }
-
-      /* ---------- Contatore ---------- */
-      .count {
-        font-size: clamp(4rem, 14vw, 10rem);
-        font-weight: 900;
-        font-variant-numeric: tabular-nums;
-        margin-top: 1rem;
-      }
-
-      footer {
-        text-align: center;
-        padding: 3rem 1rem;
-        opacity: 0.5;
-        font-size: 0.9rem;
-      }
-
-      /* ---------- Keyframes ---------- */
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: none;
-        }
-      }
-      @keyframes letterIn {
-        to {
-          opacity: 1;
-          transform: none;
-        }
-      }
-      @keyframes shimmer {
-        to {
-          background-position: 300% 0;
-        }
-      }
-      @keyframes wiggle {
-        0%,
-        100% {
-          transform: rotate(0);
-        }
-        25% {
-          transform: rotate(-12deg) scale(1.1);
-        }
-        75% {
-          transform: rotate(12deg) scale(1.1);
-        }
-      }
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scaleY(0.2);
-          opacity: 0.3;
-        }
-        50% {
-          transform: scaleY(1);
-          opacity: 1;
-        }
-      }
-
-      /* Rispetta chi ha disattivato le animazioni nel sistema */
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -326,96 +617,171 @@
         }
       }
 
-      @media (max-width: 600px) {
-        .glow {
-          display: none;
+      @media (max-width: 700px) {
+        .tag {
+          font-size: 0.7rem;
+        }
+        .scene {
+          transform: scale(0.85);
         }
       }
     </style>
   </head>
   <body>
-    <div class="blob one"></div>
-    <div class="blob two"></div>
-    <div class="blob three"></div>
-    <canvas id="particles"></canvas>
-    <div class="glow" id="glow"></div>
+    <!-- HERO -->
+    <header class="hero">
+      <div class="orb a"></div>
+      <div class="orb b"></div>
+      <div class="floor"></div>
 
-    <!-- Hero -->
-    <section>
-      <div class="wrap">
-        <span class="eyebrow">Motion design · demo</span>
+      <div>
+        <span class="badge"><i></i> Nebula X · edizione 2026</span>
         <h1>
-          <span class="letters" id="title">Muoviti</span><br />
-          <span class="gradient-text">con stile</span>
+          <span class="line">Dentro il</span>
+          <span class="line grad">computer.</span>
         </h1>
-        <p class="sub">Una pagina senza librerie esterne: solo CSS e un po' di JavaScript.</p>
-        <a class="cta" href="#trucchi">Scopri i trucchi ↓</a>
-        <div class="scroll-hint"></div>
+        <p>Scorri e guarda un PC separarsi pezzo per pezzo, come in una vera esplosione di componenti.</p>
+        <a class="btn" href="#scomposizione">Inizia la scomposizione</a>
+      </div>
+
+      <div class="hint">Scorri</div>
+    </header>
+
+    <!-- SCOMPOSIZIONE -->
+    <section class="explode" id="scomposizione">
+      <div class="stage">
+        <div class="intro-txt">
+          <h2>Scomposizione</h2>
+          <p>Più scorri, più il PC si apre.</p>
+        </div>
+
+        <div class="scene" id="scene">
+          <div class="rig">
+            <!-- Chassis -->
+            <div class="piece chassis" style="--w: 460px; --h: 600px; --bx: 0px; --by: 0px; --ez: -320px; --ey: 0px"></div>
+
+            <!-- Scheda madre -->
+            <div class="piece mobo" style="--w: 380px; --h: 430px; --bx: 0px; --by: 0px; --ez: -60px; --ey: 30px"></div>
+
+            <!-- Processore -->
+            <div class="piece cpu" style="--w: 84px; --h: 84px; --bx: -60px; --by: -80px; --ez: 140px; --ey: -40px"></div>
+
+            <!-- Dissipatore sopra al processore -->
+            <div class="piece cooler" style="--w: 150px; --h: 150px; --bx: -60px; --by: -80px; --ez: 320px; --ey: -150px; --r: 50%"></div>
+
+            <!-- RAM: 4 stecche -->
+            <div class="piece ram" style="--w: 16px; --h: 220px; --bx: 110px; --by: -90px; --ez: 180px; --ex: 40px"></div>
+            <div class="piece ram" style="--w: 16px; --h: 220px; --bx: 132px; --by: -90px; --ez: 240px; --ex: 80px"></div>
+            <div class="piece ram" style="--w: 16px; --h: 220px; --bx: 154px; --by: -90px; --ez: 300px; --ex: 120px"></div>
+            <div class="piece ram" style="--w: 16px; --h: 220px; --bx: 176px; --by: -90px; --ez: 360px; --ex: 160px"></div>
+
+            <!-- Scheda video -->
+            <div class="piece gpu" style="--w: 300px; --h: 90px; --bx: -20px; --by: 110px; --ez: 60px; --ey: 260px; --ex: 60px"></div>
+
+            <!-- Ventole -->
+            <div class="piece fan" style="--w: 110px; --h: 110px; --bx: -120px; --by: 40px; --ez: 380px; --ex: -180px"></div>
+            <div class="piece fan" style="--w: 110px; --h: 110px; --bx: 120px; --by: 40px; --ez: 420px; --ex: 220px; --ey: -60px"></div>
+
+            <!-- SSD -->
+            <div class="piece ssd" style="--w: 110px; --h: 26px; --bx: -90px; --by: 170px; --ez: 220px; --ex: -260px; --ey: 150px"></div>
+
+            <!-- Alimentatore -->
+            <div class="piece psu" style="--w: 150px; --h: 110px; --bx: 70px; --by: 180px; --ez: -180px; --ex: 260px; --ey: 220px"></div>
+
+          </div>
+
+          <!-- Etichette: fuori dal piano 3D così il testo resta dritto -->
+          <div class="labels">
+            <div class="tag l" style="left: 2%; top: 14%; --d: 0.1s"><b>Dissipatore</b></div>
+            <div class="tag l" style="left: 2%; top: 42%; --d: 0.2s"><b>Processore</b></div>
+            <div class="tag r" style="right: 2%; top: 24%; --d: 0.3s"><b>RAM</b></div>
+            <div class="tag l" style="left: 6%; top: 66%; --d: 0.4s"><b>SSD</b></div>
+            <div class="tag r" style="right: 4%; top: 58%; --d: 0.5s"><b>Scheda video</b></div>
+            <div class="tag r" style="right: 2%; top: 82%; --d: 0.6s"><b>Alimentatore</b></div>
+          </div>
+        </div>
+
+        <div class="readout" id="readout">Esplosione <span id="pct">0</span>%</div>
       </div>
     </section>
 
-    <!-- Trucchi -->
-    <section id="trucchi">
+    <!-- SPECIFICHE -->
+    <section class="specs">
       <div class="wrap">
-        <h2 class="reveal">Cosa fa?</h2>
-        <div class="cards">
-          <div class="card reveal">
-            <span class="icon">🌀</span>
-            <h3>Sfondo fluido</h3>
-            <p>Tre sfere sfocate che si spostano lentamente e cambiano scala.</p>
+        <h2 class="big reveal">Cosa c'è<br />dentro.</h2>
+        <p class="sub reveal">Un sistema pensato per essere veloce, silenzioso e bello da guardare.</p>
+
+        <div class="specs-grid">
+          <div class="spec reveal" style="--c: var(--gold)">
+            <small>Processore</small>
+            <strong>16 core</strong>
+            <p>Calcolo parallelo per giochi, video e tutto ciò che fa girare la ventola.</p>
           </div>
-          <div class="card reveal">
-            <span class="icon">🔤</span>
-            <h3>Lettere a cascata</h3>
-            <p>Ogni lettera entra con un ritardo diverso e una leggera rotazione.</p>
+          <div class="spec reveal" style="--c: var(--pink)">
+            <small>Scheda video</small>
+            <strong>Ray tracing</strong>
+            <p>Luci e riflessi realistici, frame dopo frame, senza rallentamenti.</p>
           </div>
-          <div class="card reveal">
-            <span class="icon">✨</span>
-            <h3>Alone del cursore</h3>
-            <p>Una luce segue il mouse e si fonde con i colori sotto.</p>
+          <div class="spec reveal" style="--c: var(--violet)">
+            <small>Memoria</small>
+            <strong>64 GB</strong>
+            <p>Quattro stecche ad alta frequenza per non dover mai chiudere nulla.</p>
           </div>
-          <div class="card reveal">
-            <span class="icon">🎈</span>
-            <h3>Reveal allo scroll</h3>
-            <p>Gli elementi salgono e appaiono quando li raggiungi.</p>
+          <div class="spec reveal" style="--c: var(--lime)">
+            <small>Archiviazione</small>
+            <strong>4 TB NVMe</strong>
+            <p>Avvio in pochi secondi e caricamenti che sembrano magia.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Contatore + bottone -->
-    <section>
-      <div class="wrap">
-        <h2 class="reveal">Clicca e scopri</h2>
-        <p class="reveal" style="opacity: 0.7">Il bottone segue il mouse quando ci passi sopra.</p>
-        <div class="count reveal" id="count">0</div>
-        <button class="magnet reveal" id="magnet" type="button">Clicca qui</button>
-      </div>
+    <!-- FINALE -->
+    <section class="outro">
+      <div class="orb a" style="top: 10%; left: 20%; opacity: 0.2"></div>
+      <h2 class="reveal">Hai smontato<br /><span class="grad">un PC.</span></h2>
+      <p class="reveal">Virtualmente, senza un cacciavite.</p>
+      <a class="btn reveal" href="#top">Torna all'inizio</a>
     </section>
 
-    <footer>Fatto con CSS, JavaScript e tanta voglia di muovere le cose.</footer>
+    <footer>Nebula X · pagina creata con Claude Code</footer>
 
     <script>
-      // Lettere del titolo: le avvolge in <span> con un ritardo diverso
-      const title = document.getElementById("title");
-      title.innerHTML = [...title.textContent]
-        .map((ch, i) => `<span style="--i:${i}">${ch === " " ? "&nbsp;" : ch}</span>`)
-        .join("");
+      // Progresso della scomposizione: 0 quando la sezione arriva, 1 alla fine
+      const section = document.getElementById("scomposizione");
+      const scene = document.getElementById("scene");
+      const explode = section;
+      const readout = document.getElementById("pct");
+      let target = 0;
+      let current = 0;
 
-      // Alone che segue il cursore, con un leggero ritardo (lerp)
-      const glow = document.getElementById("glow");
-      let mx = innerWidth / 2, my = innerHeight / 2, gx = mx, gy = my;
-      addEventListener("pointermove", (e) => {
-        mx = e.clientX;
-        my = e.clientY;
-      });
-      (function followGlow() {
-        gx += (mx - gx) * 0.12;
-        gy += (my - gy) * 0.12;
-        glow.style.left = gx + "px";
-        glow.style.top = gy + "px";
-        requestAnimationFrame(followGlow);
+      function measure() {
+        const r = section.getBoundingClientRect();
+        const total = section.offsetHeight - innerHeight;
+        const scrolled = -r.top;
+        target = Math.min(Math.max(scrolled / total, 0), 1);
+        // Le etichette compaiono nell'ultimo tratto
+        section.classList.toggle("lit", target > 0.7);
+      }
+      addEventListener("scroll", measure, { passive: true });
+      addEventListener("resize", measure);
+      measure();
+
+      // Movimento morbido verso il valore di scroll
+      (function animate() {
+        current += (target - current) * 0.08;
+        scene.style.setProperty("--p", current.toFixed(4));
+        readout.textContent = Math.round(current * 100);
+        requestAnimationFrame(animate);
       })();
+
+      // Inclinazione del PC con il mouse
+      addEventListener("pointermove", (e) => {
+        const x = e.clientX / innerWidth - 0.5;
+        const y = e.clientY / innerHeight - 0.5;
+        scene.style.setProperty("--ry", x * 30 + "deg");
+        scene.style.setProperty("--rx", -y * 20 + "deg");
+      });
 
       // Reveal allo scroll
       const io = new IntersectionObserver(
@@ -427,121 +793,11 @@
             }
           }
         },
-        { threshold: 0.15 }
+        { threshold: 0.2 }
       );
       document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
 
-      // Inclinazione 3D delle card con il mouse
-      document.querySelectorAll(".card").forEach((card) => {
-        card.addEventListener("pointermove", (e) => {
-          const r = card.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width - 0.5;
-          const y = (e.clientY - r.top) / r.height - 0.5;
-          card.style.transform = `perspective(700px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) translateY(-6px)`;
-        });
-        card.addEventListener("pointerleave", () => {
-          card.style.transform = "";
-        });
-      });
-
-      // Bottone magnetico + contatore
-      const magnet = document.getElementById("magnet");
-      const countEl = document.getElementById("count");
-      let clicks = 0;
-      magnet.addEventListener("pointermove", (e) => {
-        const r = magnet.getBoundingClientRect();
-        const x = e.clientX - (r.left + r.width / 2);
-        const y = e.clientY - (r.top + r.height / 2);
-        magnet.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
-      });
-      magnet.addEventListener("pointerleave", () => {
-        magnet.style.transform = "";
-      });
-      magnet.addEventListener("click", () => {
-        clicks += 1;
-        countEl.textContent = clicks;
-        countEl.animate(
-          [
-            { transform: "scale(1)" },
-            { transform: "scale(1.3) rotate(-4deg)" },
-            { transform: "scale(1)" },
-          ],
-          { duration: 350, easing: "cubic-bezier(0.2, 0.9, 0.3, 1.4)" }
-        );
-        // Piccola esplosione di particelle
-        burst(magnet.getBoundingClientRect());
-      });
-
-      // Canvas con particelle che galleggiano
-      const canvas = document.getElementById("particles");
-      const ctx = canvas.getContext("2d");
-      const colors = ["#ff5fa2", "#7c5cff", "#22d3ee", "#facc15"];
-      let parts = [];
-      function resize() {
-        canvas.width = innerWidth * devicePixelRatio;
-        canvas.height = innerHeight * devicePixelRatio;
-        ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-      }
-      addEventListener("resize", resize);
-      resize();
-      for (let i = 0; i < 60; i++) {
-        parts.push(newPart(true));
-      }
-      function newPart(anywhere) {
-        return {
-          x: Math.random() * innerWidth,
-          y: anywhere ? Math.random() * innerHeight : innerHeight + 10,
-          r: 1 + Math.random() * 3,
-          vy: -(0.2 + Math.random() * 0.6),
-          vx: (Math.random() - 0.5) * 0.3,
-          c: colors[Math.floor(Math.random() * colors.length)],
-          life: 1,
-          burst: false,
-        };
-      }
-      function burst(rect) {
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        for (let i = 0; i < 40; i++) {
-          const a = Math.random() * Math.PI * 2;
-          const s = 2 + Math.random() * 5;
-          parts.push({
-            x: cx,
-            y: cy,
-            r: 2 + Math.random() * 3,
-            vx: Math.cos(a) * s,
-            vy: Math.sin(a) * s,
-            c: colors[Math.floor(Math.random() * colors.length)],
-            life: 1,
-            burst: true,
-          });
-        }
-      }
-      (function draw() {
-        ctx.clearRect(0, 0, innerWidth, innerHeight);
-        parts = parts.filter((p) => p.life > 0);
-        for (const p of parts) {
-          p.x += p.vx;
-          p.y += p.vy;
-          if (p.burst) {
-            p.vx *= 0.96;
-            p.vy = p.vy * 0.96 + 0.08;
-            p.life -= 0.018;
-          } else if (p.y < -10) {
-            Object.assign(p, newPart(false));
-          }
-          ctx.globalAlpha = Math.max(p.life, 0) * 0.8;
-          ctx.fillStyle = p.c;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        // Mantiene almeno un po' di particelle di sfondo
-        while (parts.filter((p) => !p.burst).length < 60) {
-          parts.push(newPart(false));
-        }
-        requestAnimationFrame(draw);
-      })();
+      // Ogni etichetta nasce con un piccolo ritardo, già gestito in CSS con --d
     </script>
   </body>
 </html>
